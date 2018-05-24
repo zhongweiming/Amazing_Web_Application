@@ -15,7 +15,19 @@
 五、	内容需求
 
 六、	web应用的软硬件环境
-
+      1.软件环境：
+      客户端：
+      （1）操作系统：Windows2000/XP/2003/Vista/7
+      （2）网络协议：TCP/IP协议
+      （3）Internet Explorer 6.0以上
+      服务器端：
+      （1）操作系统：Windows  Server  2003  Enterprise  Edition
+      （2）网络协议：TCP/IP协议
+      （3）WEB服务器：Internet  Information  Server  6.0
+      （4）数据库：Microsoft SQL Sever 2005 Developer Edition
+      2.硬件环境：
+      （1）服务器：CPU:Pentium 双核 以上 ,内存:1G以上
+      （2）客户机：CPU:P4 以上,内存:256M以上
 七、	项目交付时间及进度安排表
 
 八、	项目反馈途径
