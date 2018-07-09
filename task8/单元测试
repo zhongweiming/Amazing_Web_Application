@@ -1,0 +1,58 @@
+单元测试 ：使用JUNIT
+首先新建一个项目，我们编写一个类
+自定义一个测试基类，在基类中完成常用的注解配置，然后让测试类继承该类，可以省去很多重复的注解代码： 
+测试基类代码如下：
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
+  spring整合Junit4单元测试基类，
+ 其他类实现该类可以省略一些注解配置。
+使用junit4进行单元测试
+@SuppressWarnings("deprecation")
+@RunWith(SpringJUnit4ClassRunner.class)
+加载配置文件，可以指定多个配置文件，locations指定的是一个数组
+@ContextConfiguration(locations={"classpath:spring/applicationContext-*.xml", "classpath:spring/springmvc.xml"})
+//启动事务控制
+@Transactional
+配置事务管理器，同时指定自动回滚
+@TransactionConfiguration(transactionManager="transactionManager", defaultRollback=true)
+public class BaseJunit4Test {
+    //进行测试时，将测试类继承该类
+    //注入service对象
+    //然后在方法上使用@Test，@RollBack，@Transaction等注解单独修饰
+}
+测试类代码如下：
+
+public class ItemsServiceImplTest extends BaseJunit4Test{
+    @Autowired
+    private ItemsService itemsService;
+    @Test
+    public void testFindItemsList() throws Exception {
+        List<ItemsCustom> itemsList = itemsService.findItemsList();
+        System.out.println(itemsList);
+    }
+}
+2。另一种实现方式：spring4.2版本提供如下两个抽象类：
+    1。org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests //与事务无关的类
+    2。org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests //可以控制事务的类
+
+将测试类继承上面两个抽象类中的一个：建议使用第二个，可以控制事务，也可以测试与事务无关的方法。
+测试类代码如下：
+测试继承AbstractTransactionalSpringContextTests这个类
+继承该类，可以测试进行事务控制，测试完成后自动回滚
+@RunWith(SpringJUnit4ClassRunner.class)
+//locations:参数值因配置文件地址来改变
+@ContextConfiguration(locations={"classpath:spring/applicationContext-*.xml", "classpath:spring/springmvc.xml"})
+public class ItemsServiceImplTest1 extends AbstractTransactionalJUnit4SpringContextTests{
+    //注入service对象
+    @Autowired
+    private ItemsService itemsService;
+    @Test
+    //还可以加入@RollBack注解 @Transaction注解来对方法进行事务注解
+    public void testFindItemsList() throws Exception {
+        List<ItemsCustom> itemsList = itemsService.findItemsList();
+        System.out.println(itemsList);
+    }   
+}
