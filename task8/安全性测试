@@ -1,0 +1,81 @@
+安全性测试
+Xss漏洞
+将重要的cookie标记为http only,   这样的话Javascript 中的document.cookie语句就不能获取到cookie了.只允许用户输入我们期望的数据。 例如：　年龄的textbox中，只允许用户输入数字。 而数字之外的字符都过滤掉。对数据进行Html Encode 处理过滤或移除特殊的Html标签， 例如: <script>, <iframe> ,  < for <, > for >, &quot for过滤JavaScript 事件的标签。例如 "onclick=", "onfocus" 等等。
+1.	防止sqL注入@Override
+2.		public User getUserById(String userid) {
+3.			User u=new User();
+4.			
+5.			Connection conn = null;
+6.			Statement st = null;
+7.			ResultSet rs = null;
+8.			
+9.			try
+10.			{
+11.				conn = DBOperator.getConnection();
+12.				String sql = "select * from users where userid="+userid;
+13.				st = conn.createStatement();
+14.				rs = st.executeQuery(sql);
+15.				if(rs.next())
+16.				{
+17.					u.setUserid(rs.getInt("userid"));
+18.					u.setName(rs.getString("name"));
+19.					u.setSex(rs.getString("sex"));
+20.					u.setAge(rs.getString("age"));
+21.					
+22.				}
+23.				
+24.			}catch(Exception ex)
+25.			{
+26.				ex.printStackTrace();
+27.				
+28.			}finally
+29.			{
+30.				DBOperator.close(rs, st, conn);
+31.				
+32.			}
+33.			
+34.			return u;
+35.		}
+然后是执行这个Dao层方法并返回信息给网页的Servlet:
+1.	 package cn.edu.hpu.sqlinject.servlet;
+2.	 
+3.	import java.io.IOException;
+4.	 
+5.	import javax.servlet.ServletException;
+6.	import javax.servlet.http.HttpServlet;
+7.	import javax.servlet.http.HttpServletRequest;
+8.	import javax.servlet.http.HttpServletResponse;
+9.	 
+10.	import cn.edu.hpu.sqlinject.dao.UserManager;
+11.	import cn.edu.hpu.sqlinject.dao.UserManagerImpl;
+12.	import cn.edu.hpu.sqlinject.domain.User;
+13.	 
+14.	public class GetUser extends HttpServlet {
+15.	 
+16.		public void doGet(HttpServletRequest request, HttpServletResponse response)
+17.				throws ServletException, IOException {
+18.			doPost(request,response);
+19.		}
+20.	 
+21.		public void doPost(HttpServletRequest request, HttpServletResponse response)
+22.				throws ServletException, IOException {
+23.			
+24.			request.setCharacterEncoding("utf-8");
+25.			response.setCharacterEncoding("utf-8");
+26.			response.setContentType("text/html;charset=UTF-8");
+27.			
+28.			String userid=(String)request.getParameter("userid");
+29.			
+30.			UserManager um=new UserManagerImpl();
+31.			User u=um.getUserById(userid);
+32.			
+33.			if(u!=null){
+34.				request.setAttribute("u", u);
+35.				request.getRequestDispatcher("/index.jsp").forward(request, response);
+36.			}else{
+37.				response.sendRedirect("error.jsp");
+38.			}
+39.			
+40.		}
+
+
